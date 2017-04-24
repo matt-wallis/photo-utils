@@ -1,6 +1,7 @@
 require 'pp'
 require 'optparse'
 require 'rmagick'
+require_relative 'geom'
 
 $options = {}
 $options[:arrow_fill_colour] = "red"
@@ -20,9 +21,10 @@ OptionParser.new do |opts|
   opts.on("-p", "--points POINTS", "Pixel co-ordinates where arrows are to point (e.g. --points '100,200 234,345')") do |ps|
     $options[:points] = ps.split.map{|c|
       begin
-	coords = c.split(",")
-	raise(ArgumentError, "Expected 2 coordinates, found: #{c}") unless coords.size == 2
-	coords.map{|y| Float(y)}	# Float() produces ArgumentError for non floaty args
+	coords_as_str = c.split(",")
+	raise(ArgumentError, "Expected 2 coordinates, found: #{c}") unless coords_as_str.size == 2
+	coords_as_f = coords_as_str.map{|y| Float(y)}	# Float() produces ArgumentError for non floaty args
+	Geom::Point.new(coords_as_f[0], coords_as_f[1])
       rescue ArgumentError => e
 	$options[:errors] << e
       end
@@ -47,51 +49,20 @@ if $options[:errors].size > 0
   exit 1
 end
 
-module Geom
-  class Point
-    attr_reader :x, :y
-    def initialize(x, y)
-      @x, @y = x, y
-    end
+class Canvas
+  def initialize(img)
+    @img = Magick::ImageList.new(img)
   end
-end
-module AddArrows
-  def self.angle(p, q)
-    return nil if p == q
-    return Math.atan((p[0] - q[0])/(p[1] = q[1]))
-    #return Math.atan((p[0] - q[0])/(p[1] = q[1]))*180/Math::PI
-  end
-  class PointAmongOthers
-    def initialize(point, others)
-      @point = point
-      @others = others	# other points
-    end
-    def direction_of_widest_opening
-      angles_to_others = @others.map{|o| AddArrows::angle(@point, o)}.compact.sort
-      complete_circle = angles_to_others << angles_to_others[0]
-      openings = []
-      complete_circle.each_cons(2) {|c| openings << AddArrows::Opening.new(c[0], c[1])}
-      widest_opening = openings.max{|a, b| a.width <=> b.width}
-      widest_opening.middle
-    end
-    def draw
-    end
-  end
-  class Opening
-    def initialize(a, b)	# a, b angles at either end of the opening
-      @a, @b = a, b
-    end
-    def width
-      (@a - @b).abs
-    end
-    def middle
-      (@a + @b)/2
-    end
+  def save(file)
+    @img.write(file)
   end
 end
 
-$points = $options[:points].map{|p| AddArrows::PointAmongOthers.new(p, $options[:points])}
-$points.each{|p|
-  pp p.direction_of_widest_opening
+#$points = $options[:points].map{|p| AddArrows::PointAmongOthers.new(p, $options[:points])}
+$options[:points].each{|p|
+  pp p.direction_of_widest_opening($options[:points])
 }
+
+$canvas = Canvas.new($options[:input_file])
+$canvas.save($options[:output_file])
 
