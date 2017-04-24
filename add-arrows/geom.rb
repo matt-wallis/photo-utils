@@ -9,12 +9,16 @@ module Geom
     end
     def direction_of_widest_opening(others)
       angles_to_others = others.map{|o| 
-	Geom::Vector.new(self, o).direction
+	angle = Geom::Vector.new(self, o).direction
+	puts "Angle from #{self} to #{o} is #{angle} radians, #{angle*180/Math::PI} degrees" unless angle.nil?
+	angle
       }.compact.sort
-      complete_circle = angles_to_others << angles_to_others[0]
+      complete_circle = angles_to_others << angles_to_others[0] + 2*Math::PI
       openings = []
       complete_circle.each_cons(2) {|c| openings << Geom::Opening.new(c[0], c[1])}
+      puts openings
       widest_opening = openings.max{|a, b| a.width <=> b.width}
+      puts "Widest opening from #{self} is #{widest_opening}"
       widest_opening.middle
     end
   end
@@ -23,23 +27,38 @@ module Geom
       @p, @q = p, q
     end
     def direction
-      if (@p.y != @q.y)
-	Math.atan((@p.x - @q.x)/(@p.y - @q.y))
-      elsif (@p.x < @q.x)
-	Math::PI/2
-      elsif (@p.x > @q.x)
-	-Math::PI/2
-      else
-	nil
+      dx = @q.x - @p.x
+      dy = @q.y - @p.y
+      return nil if dx == 0 and dy == 0
+      a = (dx == 0) ? (dy/dy.abs)*Math::PI/2 : Math::atan(dy/dx)
+      if dx < 0
+	a += Math::PI
       end
+      if a < 0.0
+	a += 2*Math::PI
+      end
+      raise "Angle out of range: #{a}" unless a >= 0.0 and 2*Math::PI
+      return a
+      #if (@p.x != @q.x)
+	#Math.atan((@q.y - @p.y)/(@q.x - @p.x))
+      #elsif (@p.y < @q.y)
+	#Math::PI/2
+      #elsif (@p.y > @q.y)
+	#-Math::PI/2
+      #else
+	#nil
+      #end
     end
   end
   class Opening
     def initialize(a, b)	# a, b angles at either end of the opening
       @a, @b = a, b
     end
+    def to_s
+      "between #{@a} and #{@b}, width: #{width}, middle: #{middle}"
+    end
     def width
-      (@a - @b).abs
+      (@b - @a).abs
     end
     def middle
       (@a + @b)/2

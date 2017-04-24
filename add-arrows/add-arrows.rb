@@ -56,13 +56,38 @@ class Canvas
   def save(file)
     @img.write(file)
   end
+  def draw_arrow(label, to_point, from_direction)
+    puts "Draw to #{to_point} from direction #{from_direction} radians, #{from_direction*180/Math::PI} degrees"
+    rotation = from_direction*180.0/Math::PI
+    arrow = Magick::Draw.new
+    arrow.translate(to_point.x, to_point.y)
+    arrow.pointsize(20)
+    arrow.fill_opacity(0)
+    arrow.stroke('red')
+    arrow.stroke_opacity(0.7)
+    arrow.stroke_width(2)
+    arrow.stroke_linecap('round')
+    arrow.stroke_linejoin('round')
+    arrow.circle(0,0, 0,10)
+    arrow.text_align(Magick::CenterAlign)
+    text_dist = 25
+    arrow.fill_opacity(0.5)
+    arrow.fill('red')
+    arrow.text(text_dist*Math::cos(from_direction), text_dist*Math::sin(from_direction) + 7, label)
+    #arrow.rotate(rotation)
+    #arrow.line(0, 0, 40, 0)
+    arrow.draw(@img)
+  end
 end
 
+$canvas = Canvas.new($options[:input_file])
 #$points = $options[:points].map{|p| AddArrows::PointAmongOthers.new(p, $options[:points])}
+$label = 1
 $options[:points].each{|p|
   pp p.direction_of_widest_opening($options[:points])
+  $canvas.draw_arrow($label.to_s, p, p.direction_of_widest_opening($options[:points]))
+  $label += 1
 }
 
-$canvas = Canvas.new($options[:input_file])
 $canvas.save($options[:output_file])
 
