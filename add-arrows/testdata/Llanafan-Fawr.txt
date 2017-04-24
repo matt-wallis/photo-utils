@@ -1,0 +1,45 @@
+Grid Ref: SN938539
+Location: Where footpath to Erwddol crosses road NW from Tanyrallt Farm 
+Problem: No sign to indicate that path exists.
+
+Grid Ref: SN935545
+Location: Where footpath between Bryngwnfel and Tynllwyn crosses road NW of TanyRallt Farm
+Problem: No sign to indicate existence of public right of way.
+
+Grid Ref: SN951532
+Location: Where public footpath crosses B4358 300m WSW of Troedrhiwdalar
+Problem: No sign to indicate existence of public rigt of way. Gate at start of path says "Private"
+
+GridRef: SN942563
+Location: Where public bridleway crosses road at Fronwen Farm
+Problem: No sign to indicate existence ofpublic right of way
+
+Grid Ref: SN937554
+Location: Bron-y-garth-isaf (ruin) on road to Cwmdulas.
+Problem: Nosign to mark public footpath.
+
+Grid Ref: SN938552
+Location: Where public footpath crosses public bridleway.
+Problem: No sign to mark public footpath that heads SE from here. Way blocked by unopenable gate.
+
+Gridref: SN940551
+Location: Where footpath from SN938552 to SN943545 crosses field boundary.
+Problem: Public footpath blocked by 2 fences, with no gate or style
+
+Gridref: SN941548
+Location: Where footpath from SN938552 to SN943545 crosses field boundary.
+Problem: Public footpath blocked by fence, with no gate or style
+
+Gridref: SN941547
+Location: Where footpath from SN938552 to SN943545 crosses field boundary.
+Problem: Public footpath blocked by fence, with no gate or style
+
+Grid Ref: SN943545
+Location: On Road, at start of public footpath to SN938552
+Problem: No sign on road to mark public footpath.
+
+Grid Ref:SN986544
+Location: On public footpath between Llwyn-garth-fawr and Afallenchwerw
+Problem: Gate onpublic right of way through old fence completely blocked by new high wire fence
+
+
