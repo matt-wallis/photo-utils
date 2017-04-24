@@ -1,5 +1,6 @@
 require 'pp'
 require 'optparse'
+require 'rmagick'
 
 $options = {}
 $options[:arrow_fill_colour] = "red"
@@ -17,12 +18,15 @@ OptionParser.new do |opts|
     $options[:output_file] = f
   end
   opts.on("-p", "--points POINTS", "Pixel co-ordinates where arrows are to point (e.g. --points '100,200 234,345')") do |ps|
-    begin
-    $options[:points] = ps.split.map{|c| c.split(",").map{|y| Float(y)} }
-    rescue ArgumentError => e
-      # Integer() will produce ArgumentError for bad args
-      $options[:errors] << e
-    end
+    $options[:points] = ps.split.map{|c|
+      begin
+	coords = c.split(",")
+	raise(ArgumentError, "Expected 2 coordinates, found: #{c}") unless coords.size == 2
+	coords.map{|y| Float(y)}	# Float() produces ArgumentError for non floaty args
+      rescue ArgumentError => e
+	$options[:errors] << e
+      end
+    }
   end
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     $options[:verbose] = v
@@ -40,8 +44,17 @@ if $options[:errors].size > 0
   $stderr.puts e
   }
   $stderr.puts "Exiting due to errors."
+  exit 1
 end
 
+module Geom
+  class Point
+    attr_reader :x, :y
+    def initialize(x, y)
+      @x, @y = x, y
+    end
+  end
+end
 module AddArrows
   def self.angle(p, q)
     return nil if p == q
@@ -60,6 +73,8 @@ module AddArrows
       complete_circle.each_cons(2) {|c| openings << AddArrows::Opening.new(c[0], c[1])}
       widest_opening = openings.max{|a, b| a.width <=> b.width}
       widest_opening.middle
+    end
+    def draw
     end
   end
   class Opening
