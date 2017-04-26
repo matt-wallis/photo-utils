@@ -13,6 +13,8 @@ module Geom
 	puts "Angle from #{self} to #{o} is #{angle} radians, #{angle*180/Math::PI} degrees" unless angle.nil?
 	angle
       }.compact.sort
+      angles_to_others = [0] if angles_to_others.size == 0
+
       complete_circle = angles_to_others << angles_to_others[0] + 2*Math::PI
       openings = []
       complete_circle.each_cons(2) {|c| openings << Geom::Opening.new(c[0], c[1])}

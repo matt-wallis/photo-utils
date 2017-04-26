@@ -1,14 +1,14 @@
-require 'pp'
 require 'optparse'
 require 'rmagick'
 require_relative 'geom'
 
 $options = {}
-$options[:arrow_fill_colour] = "red"
+$options[:fill_colour] = "red"
 $options[:points] = []
 $options[:input_file] = nil
 $options[:output_file] = nil
 $options[:errors] = []
+$options[:verbose] = false
 OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} [$options]"
 
@@ -39,8 +39,6 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-p $options
-p ARGV
 if $options[:errors].size > 0
   $options[:errors].each {|e|
   $stderr.puts e
@@ -50,30 +48,34 @@ if $options[:errors].size > 0
 end
 
 class Canvas
-  def initialize(img)
+  def initialize(img, label = 0)
+    @label = label
     @img = Magick::ImageList.new(img)
   end
   def save(file)
     @img.write(file)
   end
-  def draw_arrow(label, to_point, from_direction)
-    puts "Draw to #{to_point} from direction #{from_direction} radians, #{from_direction*180/Math::PI} degrees"
-    rotation = from_direction*180.0/Math::PI
+  def draw_point(point, label_direction)
+    @label += 1
+    puts "Draw to #{point} from direction #{label_direction} radians, #{label_direction*180/Math::PI} degrees"
+    rotation = label_direction*180.0/Math::PI
     arrow = Magick::Draw.new
-    arrow.translate(to_point.x, to_point.y)
+    arrow.translate(point.x, point.y)
     arrow.pointsize(20)
     arrow.fill_opacity(0)
-    arrow.stroke('red')
+    arrow.stroke($options[:fill_colour])
     arrow.stroke_opacity(0.7)
     arrow.stroke_width(2)
-    arrow.stroke_linecap('round')
-    arrow.stroke_linejoin('round')
     arrow.circle(0,0, 0,10)
     arrow.text_align(Magick::CenterAlign)
     text_dist = 25
     arrow.fill_opacity(0.5)
-    arrow.fill('red')
-    arrow.text(text_dist*Math::cos(from_direction), text_dist*Math::sin(from_direction) + 7, label)
+    arrow.fill($options[:fill_colour])
+    arrow.text(text_dist*Math::cos(label_direction), text_dist*Math::sin(label_direction) + 7, @label.to_s)
+    # The original plan was to use arrows, coming from a direction that was less likely to
+    # interfere with other points:
+    #arrow.stroke_linecap('round')
+    #arrow.stroke_linejoin('round')
     #arrow.rotate(rotation)
     #arrow.line(0, 0, 40, 0)
     arrow.draw(@img)
@@ -81,13 +83,8 @@ class Canvas
 end
 
 $canvas = Canvas.new($options[:input_file])
-#$points = $options[:points].map{|p| AddArrows::PointAmongOthers.new(p, $options[:points])}
-$label = 1
 $options[:points].each{|p|
-  pp p.direction_of_widest_opening($options[:points])
-  $canvas.draw_arrow($label.to_s, p, p.direction_of_widest_opening($options[:points]))
-  $label += 1
+  $canvas.draw_point(p, p.direction_of_widest_opening($options[:points]))
 }
-
 $canvas.save($options[:output_file])
 
