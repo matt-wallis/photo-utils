@@ -1,13 +1,22 @@
-.PHONY: test-images
+.PHONY: test-images test
 
 .DEFAULT_GOAL:= test-images
 
 RUBY := ruby2.4
 MAKE_TEST_IMAGES := make-test-images.rb
-OUTDIR := out
+TRANSFORM_IMAGES := transform-images.rb
+TESTDATADIR := testdata
+TESTRESDIR := testresults
+IMAGE_SET := image-set.txt
 
-$(OUTDIR):
+$(TESTDATADIR):
 	mkdir -p $@
 
-test-images: | $(OUTDIR)
-	$(RUBY) $(MAKE_TEST_IMAGES) --output-directory $(OUTDIR)
+$(TESTRESDIR):
+	mkdir -p $@
+
+test-images: | $(TESTDATADIR)
+	$(RUBY) $(MAKE_TEST_IMAGES) --output-directory $(TESTDATADIR) --image-set $(IMAGE_SET)
+
+test: | $(TESTRESDIR)
+	$(RUBY) $(TRANSFORM_IMAGES) --output-directory $(TESTRESDIR) --image-set $(IMAGE_SET)
