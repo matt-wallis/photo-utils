@@ -12,10 +12,10 @@ $options[:verbose] = false
 OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} [$options]"
 
-  opts.on("-i", "--input-file INPUT", "Name of image file to which arrows are to be added") do |f|
+  opts.on("-i", "--input-file INPUT", "Name of original image file. --points are specified using pixel-coordinates of this file") do |f|
     $options[:input_file] = f
   end
-  opts.on("-o", "--output-file OUTPUT", "Name of output file to which arrows have been added") do |f|
+  opts.on("-o", "--output-file OUTPUT", "Name of output file. Original image plus arrows will be written here") do |f|
     $options[:output_file] = f
   end
   opts.on("-p", "--points POINTS", "Pixel co-ordinates where arrows are to point (e.g. --points '100,200 234,345')") do |ps|

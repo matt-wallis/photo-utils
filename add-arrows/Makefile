@@ -2,7 +2,7 @@
 
 .DEFAULT_GOAL:= tests
 
-RUBY := ruby2.3
+RUBY := ruby2.4
 ADD_ARROWS := add-arrows.rb
 OUTDIR := out
 
