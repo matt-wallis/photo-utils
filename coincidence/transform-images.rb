@@ -2,7 +2,7 @@ require 'optparse'
 require 'rmagick'
 require 'pp'
 require_relative 'image-set'
-include Magick
+#include Magick
 
 $options = {
   output_dir: nil,
@@ -24,9 +24,6 @@ OptionParser.new do |opts|
     unless File.exist?(f)
       $errors << "Image set file #{f} does not exist"
     end
-    image_set = Coincidence::ImageSet.new
-    image_set.read_image_set_file($options[:image_set])
-    pp image_set
   end
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     $options[:verbose] = v
@@ -47,4 +44,21 @@ if $errors.size > 0
   $stderr.puts "Exiting due to errors."
   exit 1
 end
+
+image_set = Coincidence::ImageSet.new
+image_set.read_image_set_file($options[:image_set])
+pp image_set
+
+mean_angle = image_set.map {|i| i.angle}.mean
+puts "Mean angle: #{mean_angle}"
+def rad_to_deg(r)
+  r * 180 / Math::PI
+end
+
+image_set.each {|i|
+  img = Magick::ImageList.new(i.filename)
+  filename = "#{$options[:output_dir]}/#{File.basename(i.filename)}"
+  img_rotated = img.rotate(rad_to_deg(mean_angle - i.angle))
+  img_rotated.write(filename)
+}
 

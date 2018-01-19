@@ -45,8 +45,8 @@ end
 
 
 # Circles from which points are to be chosen at random:
-Centres = [[0.2, 0.2], [0.6, 0.7]]
-Radius = 0.2
+Centres = [[0.1, 0.1], [0.6, 0.7]]
+Radius = 0.3
 N_images = 3
 Foreground = 'green'
 Background = 'tomato'
@@ -65,6 +65,8 @@ image_set = Coincidence::ImageSet.new
   line = Draw.new
   line.stroke(Foreground)
   line.polyline(*pts.flatten)
+  line.polyline(5, 5, 5, width-5)
+  line.polyline(5, 5, height-5, 5)
   line.draw(img)
   img.write(filename)
   image_set.add_image(filename, pts)
