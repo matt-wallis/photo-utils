@@ -55,10 +55,21 @@ def rad_to_deg(r)
   r * 180 / Math::PI
 end
 
+min_dist = image_set.map {|i| i.dist}.min
+
 image_set.each {|i|
   img = Magick::ImageList.new(i.filename)
+  img.background_color = 'blue'
   filename = "#{$options[:output_dir]}/#{File.basename(i.filename)}"
   img_rotated = img.rotate(rad_to_deg(mean_angle - i.angle))
   img_rotated.write(filename)
+  aff_filename = "#{$options[:output_dir]}/aff_#{File.basename(i.filename)}"
+  scaling = min_dist/i.dist 
+  rotation = mean_angle - i.angle
+  tx = -i.ax
+  ty = -i.ay
+  matrix = Magick::AffineMatrix.new(scaling, rotation, rotation, scaling, tx, tx)
+  img_affined = img.affine_transform(matrix)
+  img_affined.write(aff_filename)
 }
 

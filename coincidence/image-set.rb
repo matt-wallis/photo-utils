@@ -29,6 +29,9 @@ module Coincidence
     def angle	# Between reference points
       Math.atan2(by - ay, bx - ax)
     end
+    def dist	# Between reference points
+      Math.sqrt((by - ay)*(by - ay) + (bx - ax)*(bx - ax))
+    end
     # Short-hand - 2 points, a and b with x and y co-ords
     def ax
       points[0][0]
