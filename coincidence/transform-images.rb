@@ -57,12 +57,19 @@ end
 
 min_dist = image_set.map {|i| i.dist}.min
 
+# Use first image to define reference point 'destinations'
+dest_points = image_set.first.points
+ref_image = Magick::ImageList.new(image_set.first.filename)
+viewport = "#{ref_image.columns}x#{ref_image.rows}+0+0"
+puts viewport
+
 image_set.each {|i|
   img = Magick::ImageList.new(i.filename)
   img.background_color = 'blue'
   filename = "#{$options[:output_dir]}/#{File.basename(i.filename)}"
   img_rotated = img.rotate(rad_to_deg(mean_angle - i.angle))
   img_rotated.write(filename)
+
   aff_filename = "#{$options[:output_dir]}/aff_#{File.basename(i.filename)}"
   scaling = min_dist/i.dist 
   rotation = mean_angle - i.angle
@@ -71,5 +78,11 @@ image_set.each {|i|
   matrix = Magick::AffineMatrix.new(scaling, rotation, rotation, scaling, tx, tx)
   img_affined = img.affine_transform(matrix)
   img_affined.write(aff_filename)
+
+  img_distorted = img.distort(Magick::AffineDistortion, i.points.zip(dest_points).flatten) {
+    self.define "distort:viewport", viewport
+  }
+  distort_filename = "#{$options[:output_dir]}/distort_#{File.basename(i.filename)}"
+  img_distorted.write(distort_filename)
 }
 

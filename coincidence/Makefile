@@ -2,7 +2,8 @@
 
 .DEFAULT_GOAL:= test-images
 
-RUBY := ruby2.4
+#RUBY := ruby2.4
+RUBY := ruby
 MAKE_TEST_IMAGES := make-test-images.rb
 TRANSFORM_IMAGES := transform-images.rb
 TESTDATADIR := testdata
